@@ -26,6 +26,7 @@ package com.github.xingshuangs.iot.protocol.modbus.service;
 
 
 import com.github.xingshuangs.iot.common.algorithm.LoopGroupAlg;
+import com.github.xingshuangs.iot.common.buff.BitWriteBuff;
 import com.github.xingshuangs.iot.common.buff.ByteReadBuff;
 import com.github.xingshuangs.iot.common.buff.ByteWriteBuff;
 import com.github.xingshuangs.iot.common.buff.EByteBuffFormat;
@@ -192,21 +193,45 @@ public abstract class ModbusSkeletonAbstract<T, R> extends TcpClientBasic {
      * @return boolean list
      */
     public List<Boolean> readCoil(int unitId, int address, int quantity) {
+        byte[] bytes = this.readCoilBytes(unitId, address, quantity);
+        return BooleanUtil.byteArrayToList(quantity, bytes);
+    }
+
+    /**
+     * Read coil byte array
+     * (读取线圈字节数据)
+     *
+     * @param address  modbus address
+     * @param quantity coil quantity
+     * @return byte array
+     */
+    public byte[] readCoilBytes(int address, int quantity) {
+        return this.readCoilBytes(this.unitId, address, quantity);
+    }
+
+    /**
+     * Read coil byte array
+     * (读取线圈字节数据)
+     *
+     * @param unitId   unit id or slave id
+     * @param address  modbus address
+     * @param quantity coil quantity
+     * @return byte array
+     */
+    public byte[] readCoilBytes(int unitId, int address, int quantity) {
         if (address < 0 || address > 65535) {
             throw new IllegalArgumentException("address < 0 || address > 65535");
         }
         if (quantity < 1) {
             throw new IllegalArgumentException("quantity<1");
         }
-
-        List<Boolean> res = new ArrayList<>();
+        BitWriteBuff buff = new BitWriteBuff(quantity);
         LoopGroupAlg.loopExecute(quantity, this.maxLengthOfReadCoil, (off, len) -> {
             MbReadCoilRequest reqPdu = new MbReadCoilRequest(address + off, len);
             MbReadCoilResponse resPdu = (MbReadCoilResponse) this.readModbusData(unitId, reqPdu);
-            List<Boolean> booleans = BooleanUtil.byteArrayToList(len, resPdu.getCoilStatus());
-            res.addAll(booleans);
+            buff.writeBits(resPdu.getCoilStatus(), len);
         });
-        return res;
+        return buff.toByteArray();
     }
 
     /**
@@ -294,6 +319,32 @@ public abstract class ModbusSkeletonAbstract<T, R> extends TcpClientBasic {
      * @return boolean list
      */
     public List<Boolean> readDiscreteInput(int unitId, int address, int quantity) {
+        byte[] bytes = this.readDiscreteInputBytes(unitId, address, quantity);
+        return BooleanUtil.byteArrayToList(quantity, bytes);
+    }
+
+    /**
+     * Read discrete input byte array
+     * (读取离散输入字节数据)
+     *
+     * @param address  modbus address
+     * @param quantity quantity
+     * @return boolean list
+     */
+    public byte[] readDiscreteInputBytes(int address, int quantity) {
+        return this.readDiscreteInputBytes(this.unitId, address, quantity);
+    }
+
+    /**
+     * Read discrete input byte array
+     * (读取离散输入字节数据)
+     *
+     * @param unitId   unit id or slave id
+     * @param address  modbus address
+     * @param quantity quantity
+     * @return byte array
+     */
+    public byte[] readDiscreteInputBytes(int unitId, int address, int quantity) {
         if (address < 0 || address > 65535) {
             throw new IllegalArgumentException("address < 0 || address > 65535");
         }
@@ -301,14 +352,13 @@ public abstract class ModbusSkeletonAbstract<T, R> extends TcpClientBasic {
             throw new IllegalArgumentException("quantity<1");
         }
 
-        List<Boolean> res = new ArrayList<>();
+        BitWriteBuff buff = new BitWriteBuff(quantity);
         LoopGroupAlg.loopExecute(quantity, this.maxLengthOfReadDiscreteInput, (off, len) -> {
             MbReadDiscreteInputRequest reqPdu = new MbReadDiscreteInputRequest(address + off, len);
             MbReadDiscreteInputResponse resPdu = (MbReadDiscreteInputResponse) this.readModbusData(unitId, reqPdu);
-            List<Boolean> booleans = BooleanUtil.byteArrayToList(len, resPdu.getInputStatus());
-            res.addAll(booleans);
+            buff.writeBits(resPdu.getInputStatus(), len);
         });
-        return res;
+        return buff.toByteArray();
     }
 
     /**

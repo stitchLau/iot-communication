@@ -64,6 +64,15 @@ public class ModbusTcpTest {
     }
 
     @Test
+    public void readCoilBytes() {
+        byte[] bytes = plc.readCoilBytes(1, 0, 2001);
+        assertEquals(251, bytes.length);
+        plc.setMaxLengthOfReadCoil(17);
+        bytes = plc.readCoilBytes(1, 0, 35);
+        assertEquals(5, bytes.length);
+    }
+
+    @Test
     public void writeCoil() {
         plc.writeCoil(0, true);
         List<Boolean> booleans = plc.readCoil(0, 1);
@@ -112,6 +121,12 @@ public class ModbusTcpTest {
     }
 
     @Test
+    public void readDiscreteInputBytes() {
+        byte[] bytes = plc.readDiscreteInputBytes(1, 0, 2002);
+        assertEquals(251, bytes.length);
+    }
+
+    @Test
     public void readInputRegister() {
         byte[] bytes = plc.readInputRegister(1, 0, 2);
         assertEquals(4, bytes.length);
@@ -131,8 +146,7 @@ public class ModbusTcpTest {
         assertArrayEquals(new byte[]{(byte) 0x00, (byte) 0x33, (byte) 0x00, (byte) 0x21}, bytes);
 
         bytes = plc.readHoldRegister(0, 4);
-        assertArrayEquals(new byte[]{(byte) 0x00, (byte) 0x33, (byte) 0x00, (byte) 0x21,
-                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00}, bytes);
+        assertArrayEquals(new byte[]{(byte) 0x00, (byte) 0x33, (byte) 0x00, (byte) 0x21, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00}, bytes);
     }
 
     @Test
