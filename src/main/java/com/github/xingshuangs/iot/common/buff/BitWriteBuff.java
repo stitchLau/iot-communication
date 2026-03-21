@@ -37,7 +37,7 @@ public class BitWriteBuff {
     private int bitPos = 0;
 
     public BitWriteBuff(int bitSize) {
-        buffer = new byte[(bitSize + 7) / 8];
+        this.buffer = new byte[(bitSize + 7) / 8];
     }
 
     /**
@@ -53,21 +53,22 @@ public class BitWriteBuff {
 
             int bit = (data[byteIndex] >> bitIndex) & 1;
 
-            writeBit(bit);
+            this.writeBit(bit);
         }
     }
 
     /**
      * 写单个bit（内部方法）
+     * write bit
      *
      * @param bit bit
      */
     private void writeBit(int bit) {
-        int byteIndex = bitPos / 8;
-        int bitIndex = bitPos % 8;
+        int byteIndex = this.bitPos / 8;
+        int bitIndex = this.bitPos % 8;
 
-        buffer[byteIndex] |= (byte) (bit << bitIndex);
-        bitPos++;
+        this.buffer[byteIndex] |= (byte) (bit << bitIndex);
+        this.bitPos++;
     }
 
     /**
@@ -86,7 +87,7 @@ public class BitWriteBuff {
 
         for (int i = 0; i < bitCount; i++) {
             int offset = lsbFirst ? i : 7 - i;
-            writeBit((val >> offset) & 1);
+            this.writeBit((val >> offset) & 1);
         }
     }
 

@@ -67,6 +67,7 @@ public class ModbusTcpTest {
     public void readCoilBytes() {
         byte[] bytes = plc.readCoilBytes(1, 0, 2001);
         assertEquals(251, bytes.length);
+        assertEquals(0x01, bytes[bytes.length - 1]);
         plc.setMaxLengthOfReadCoil(17);
         bytes = plc.readCoilBytes(1, 0, 35);
         assertEquals(5, bytes.length);
@@ -124,6 +125,7 @@ public class ModbusTcpTest {
     public void readDiscreteInputBytes() {
         byte[] bytes = plc.readDiscreteInputBytes(1, 0, 2002);
         assertEquals(251, bytes.length);
+        assertEquals(0x01, bytes[bytes.length - 1]);
     }
 
     @Test
